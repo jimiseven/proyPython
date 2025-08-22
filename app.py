@@ -46,10 +46,9 @@ def guardar_vacuna():
             cursor.close()
             db.close()
             return redirect(url_for('index'))
-
     return "Hubo un error al guardar los datos."
 
-# **NUEVA RUTA para mostrar los registros**
+# Ruta para mostrar los registros
 @app.route('/vacunas')
 def mostrar_vacunas():
     db = get_db_connection()
@@ -61,6 +60,58 @@ def mostrar_vacunas():
         cursor.close()
         db.close()
     return render_template('vacunas.html', vacunas=vacunas)
+
+# ----------------- Funciones CRUD Adicionales -----------------
+
+# Ruta para eliminar un registro
+@app.route('/eliminar/<int:id>', methods=['GET'])
+def eliminar_vacuna(id):
+    db = get_db_connection()
+    if db:
+        cursor = db.cursor()
+        sql = "DELETE FROM vacunas_ninos WHERE id = %s"
+        cursor.execute(sql, (id,))
+        db.commit()
+        cursor.close()
+        db.close()
+    return redirect(url_for('mostrar_vacunas'))
+
+# Ruta para mostrar el formulario de edición
+@app.route('/editar/<int:id>', methods=['GET'])
+def editar_vacuna(id):
+    db = get_db_connection()
+    vacuna = None
+    if db:
+        cursor = db.cursor(dictionary=True)
+        sql = "SELECT * FROM vacunas_ninos WHERE id = %s"
+        cursor.execute(sql, (id,))
+        vacuna = cursor.fetchone()
+        cursor.close()
+        db.close()
+    return render_template('editar.html', vacuna=vacuna)
+
+# Ruta para guardar los cambios de un registro
+@app.route('/actualizar_vacuna/<int:id>', methods=['POST'])
+def actualizar_vacuna(id):
+    if request.method == 'POST':
+        # Obtener los datos del formulario de edición
+        nombre = request.form['nombre']
+        apellido_paterno = request.form['apellido_paterno']
+        apellido_materno = request.form['apellido_materno']
+        fecha_nacimiento = request.form['fecha_nacimiento']
+        nombre_responsable = request.form['nombre_responsable']
+        tipo_vacuna = request.form['tipo_vacuna']
+
+        db = get_db_connection()
+        if db:
+            cursor = db.cursor()
+            sql = "UPDATE vacunas_ninos SET nombre = %s, apellido_paterno = %s, apellido_materno = %s, fecha_nacimiento = %s, nombre_responsable = %s, tipo_vacuna = %s WHERE id = %s"
+            val = (nombre, apellido_paterno, apellido_materno, fecha_nacimiento, nombre_responsable, tipo_vacuna, id)
+            cursor.execute(sql, val)
+            db.commit()
+            cursor.close()
+            db.close()
+    return redirect(url_for('mostrar_vacunas'))
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -18,7 +18,7 @@
                     <th>Nombre del Niño</th>
                     <th>Fecha de Nacimiento</th>
                     <th>Tipo de Vacuna</th>
-                </tr>
+                    <th>Acciones</th> </tr>
             </thead>
             <tbody>
                 {% for vacuna in vacunas %}
@@ -27,6 +27,10 @@
                     <td>{{ vacuna['nombre'] }} {{ vacuna['apellido_paterno'] }}</td>
                     <td>{{ vacuna['fecha_nacimiento'] }}</td>
                     <td>{{ vacuna['tipo_vacuna'] }}</td>
+                    <td>
+                        <a href="{{ url_for('eliminar_vacuna', id=vacuna['id']) }}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que quieres eliminar este registro?');">Eliminar</a>
+                        <a href="{{ url_for('editar_vacuna', id=vacuna['id']) }}" class="btn btn-warning btn-sm">Editar</a>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
