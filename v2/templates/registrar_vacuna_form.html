@@ -13,7 +13,7 @@
         <a href="{{ url_for('niños_modulo') }}" class="btn btn-secondary mb-3"><i class="bi bi-arrow-left"></i> Volver a la lista</a>
         
         <div class="card p-4">
-            <form action="{{ url_for('guardar_vacuna_niño', id_nino=niño['id']) }}" method="post"></form>
+            <form action="{{ url_for('guardar_vacuna_niño', id_nino=niño['id']) }}" method="post">
                 
                 <div class="mb-3">
                     <label for="id_responsable" class="form-label">Responsable:</label>

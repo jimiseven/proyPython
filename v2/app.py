@@ -50,7 +50,6 @@ def niños_modulo():
 
 # --- Funcionalidades para el Módulo de Niños ---
 
-# Ruta para ELIMINAR un niño
 @app.route('/eliminar_niño/<int:id>', methods=['GET'])
 def eliminar_niño(id):
     db = get_db_connection()
@@ -63,7 +62,6 @@ def eliminar_niño(id):
         db.close()
     return redirect(url_for('niños_modulo'))
 
-# Ruta para REVISAR la información y el historial de vacunas de un niño
 @app.route('/niño/<int:id>')
 def revisar_niño(id):
     db = get_db_connection()
@@ -72,12 +70,10 @@ def revisar_niño(id):
     if db:
         cursor = db.cursor(dictionary=True)
         
-        # Consulta para obtener los datos del niño
         sql_niño = "SELECT * FROM niños WHERE id = %s"
         cursor.execute(sql_niño, (id,))
         niño = cursor.fetchone()
 
-        # Consulta para obtener el historial de vacunas del niño, uniendo tablas
         sql_historial = """
             SELECT 
                 va.fecha_aplicacion, 
@@ -103,7 +99,6 @@ def revisar_niño(id):
         
     return render_template('niño_detalle.html', niño=niño, historial=historial_vacunas)
 
-# Ruta para mostrar el formulario de REGISTRO DE VACUNA
 @app.route('/registrar_vacuna/<int:id>')
 def registrar_vacuna_form(id):
     db = get_db_connection()
@@ -115,20 +110,16 @@ def registrar_vacuna_form(id):
     if db:
         cursor = db.cursor(dictionary=True)
         
-        # Obtener los datos del niño para mostrarlos en el formulario
         sql_niño = "SELECT id, nombre, apellido_paterno FROM niños WHERE id = %s"
         cursor.execute(sql_niño, (id,))
         niño = cursor.fetchone()
 
-        # Obtener los tipos de vacunas para el dropdown
         cursor.execute("SELECT id, nombre FROM tipos_vacuna ORDER BY nombre")
         tipos_vacuna = cursor.fetchall()
 
-        # Obtener el personal para el dropdown
         cursor.execute("SELECT id, nombre FROM personal_vacunador ORDER BY nombre")
         personal = cursor.fetchall()
         
-        # Obtener los responsables para el dropdown
         cursor.execute("SELECT id, nombre FROM responsables ORDER BY nombre")
         responsables = cursor.fetchall()
         
@@ -144,8 +135,6 @@ def registrar_vacuna_form(id):
                            personal=personal,
                            responsables=responsables)
 
-
-# Ruta para GUARDAR la nueva vacuna
 @app.route('/guardar_vacuna_niño/<int:id_nino>', methods=['POST'])
 def guardar_vacuna_niño(id_nino):
     if request.method == 'POST':
@@ -159,7 +148,7 @@ def guardar_vacuna_niño(id_nino):
         if db:
             cursor = db.cursor()
             sql = "INSERT INTO vacunas_aplicadas (id_niño, id_responsable, id_vacuna, id_personal, fecha_aplicacion, dosis) VALUES (%s, %s, %s, %s, %s, %s)"
-            val = (id_niño, id_responsable, id_vacuna, id_personal, fecha_aplicacion, dosis)
+            val = (id_nino, id_responsable, id_vacuna, id_personal, fecha_aplicacion, dosis)
             cursor.execute(sql, val)
             db.commit()
             cursor.close()
@@ -167,14 +156,74 @@ def guardar_vacuna_niño(id_nino):
             
     return redirect(url_for('niños_modulo'))
 
-# Rutas de otros módulos (sin cambios)
+# --- Módulo de Personal ---
 @app.route('/personal')
 def personal_modulo():
-    return render_template('personal.html')
+    db = get_db_connection()
+    personal = []
+    if db:
+        cursor = db.cursor(dictionary=True)
+        cursor.execute("SELECT id, nombre, rol FROM personal_vacunador ORDER BY id DESC")
+        personal = cursor.fetchall()
+        cursor.close()
+        db.close()
+    return render_template('personal.html', personal=personal)
 
+@app.route('/registrar_personal_form')
+def registrar_personal_form():
+    return render_template('registrar_personal_form.html')
+
+@app.route('/guardar_personal', methods=['POST'])
+def guardar_personal():
+    if request.method == 'POST':
+        nombre = request.form['nombre']
+        rol = request.form['rol']
+        
+        db = get_db_connection()
+        if db:
+            cursor = db.cursor()
+            sql = "INSERT INTO personal_vacunador (nombre, rol) VALUES (%s, %s)"
+            val = (nombre, rol)
+            cursor.execute(sql, val)
+            db.commit()
+            cursor.close()
+            db.close()
+    return redirect(url_for('personal_modulo'))
+
+@app.route('/eliminar_personal/<int:id>', methods=['GET'])
+def eliminar_personal(id):
+    db = get_db_connection()
+    if db:
+        cursor = db.cursor()
+        sql = "DELETE FROM personal_vacunador WHERE id = %s"
+        cursor.execute(sql, (id,))
+        db.commit()
+        cursor.close()
+        db.close()
+    return redirect(url_for('personal_modulo'))
+
+# --- NUEVO MÓDULO: Reporte de Vacunas ---
 @app.route('/vacunas_reporte')
 def vacunas_reporte_modulo():
-    return "Esta será la página de reporte de vacunas."
+    db = get_db_connection()
+    reporte = []
+    if db:
+        cursor = db.cursor(dictionary=True)
+        # Consulta para contar las vacunas aplicadas por tipo
+        sql = """
+            SELECT 
+                tv.nombre AS tipo_vacuna, 
+                COUNT(va.id) AS total_dosis_aplicadas
+            FROM vacunas_aplicadas va
+            JOIN tipos_vacuna tv ON va.id_vacuna = tv.id
+            GROUP BY tv.nombre
+            ORDER BY total_dosis_aplicadas DESC
+        """
+        cursor.execute(sql)
+        reporte = cursor.fetchall()
+        cursor.close()
+        db.close()
+    return render_template('vacunas_reporte.html', reporte=reporte)
 
 if __name__ == '__main__':
     app.run(debug=True)

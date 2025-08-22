@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Personal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body class="bg-light">
+    <div class="container mt-4">
+        <h1 class="mb-4">Registrar Nuevo Personal</h1>
+        <a href="{{ url_for('personal_modulo') }}" class="btn btn-secondary mb-3"><i class="bi bi-arrow-left"></i> Volver a la lista</a>
+        
+        <div class="card p-4">
+            <form action="{{ url_for('guardar_personal') }}" method="post">
+                <div class="mb-3">
+                    <label for="nombre" class="form-label">Nombre Completo:</label>
+                    <input type="text" id="nombre" name="nombre" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="rol" class="form-label">Rol:</label>
+                    <input type="text" id="rol" name="rol" class="form-control" placeholder="Ej: Enfermero/a, Pediatra" required>
+                </div>
+                <button type="submit" class="btn btn-success"><i class="bi bi-save"></i> Guardar Personal</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
