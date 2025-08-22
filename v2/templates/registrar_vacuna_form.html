@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Vacuna</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body class="bg-light">
+    <div class="container mt-4">
+        <h1 class="mb-4">Registrar Vacuna para {{ niño['nombre'] }} {{ niño['apellido_paterno'] }}</h1>
+        <a href="{{ url_for('niños_modulo') }}" class="btn btn-secondary mb-3"><i class="bi bi-arrow-left"></i> Volver a la lista</a>
+        
+        <div class="card p-4">
+            <form action="{{ url_for('guardar_vacuna_niño', id_nino=niño['id']) }}" method="post"></form>
+                
+                <div class="mb-3">
+                    <label for="id_responsable" class="form-label">Responsable:</label>
+                    <select id="id_responsable" name="id_responsable" class="form-select" required>
+                        <option value="">Seleccione un responsable</option>
+                        {% for responsable in responsables %}
+                        <option value="{{ responsable['id'] }}">{{ responsable['nombre'] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_vacuna" class="form-label">Tipo de Vacuna:</label>
+                    <select id="id_vacuna" name="id_vacuna" class="form-select" required>
+                        <option value="">Seleccione una vacuna</option>
+                        {% for vacuna in tipos_vacuna %}
+                        <option value="{{ vacuna['id'] }}">{{ vacuna['nombre'] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_personal" class="form-label">Personal Vacunador:</label>
+                    <select id="id_personal" name="id_personal" class="form-select" required>
+                        <option value="">Seleccione el personal</option>
+                        {% for persona in personal %}
+                        <option value="{{ persona['id'] }}">{{ persona['nombre'] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="fecha_aplicacion" class="form-label">Fecha de Aplicación:</label>
+                    <input type="date" id="fecha_aplicacion" name="fecha_aplicacion" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="dosis" class="form-label">Dosis:</label>
+                    <input type="number" id="dosis" name="dosis" class="form-control" required min="1" value="1">
+                </div>
+
+                <button type="submit" class="btn btn-success"><i class="bi bi-save"></i> Guardar Vacuna</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

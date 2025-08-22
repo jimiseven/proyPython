@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles del Niño</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body class="bg-light">
+    <div class="container mt-4">
+        <h1 class="mb-4">Detalles de {{ niño['nombre'] }} {{ niño['apellido_paterno'] }}</h1>
+        <a href="{{ url_for('niños_modulo') }}" class="btn btn-secondary mb-3"><i class="bi bi-arrow-left"></i> Volver a la lista de niños</a>
+
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                Información Personal
+            </div>
+            <div class="card-body">
+                <p><strong>Nombre completo:</strong> {{ niño['nombre'] }} {{ niño['apellido_paterno'] }} {{ niño['apellido_materno'] }}</p>
+                <p><strong>Fecha de Nacimiento:</strong> {{ niño['fecha_nacimiento'] }}</p>
+            </div>
+        </div>
+
+        <h3 class="mt-5">Historial de Vacunas Aplicadas</h3>
+        {% if historial %}
+        <table class="table table-striped table-hover table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Fecha de Aplicación</th>
+                    <th>Tipo de Vacuna</th>
+                    <th>Dosis</th>
+                    <th>Personal Vacunador</th>
+                    <th>Responsable</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for registro in historial %}
+                <tr>
+                    <td>{{ registro['fecha_aplicacion'] }}</td>
+                    <td>{{ registro['tipo_vacuna'] }}</td>
+                    <td>{{ registro['dosis'] }}</td>
+                    <td>{{ registro['personal_vacunador'] }}</td>
+                    <td>{{ registro['nombre_responsable'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="alert alert-info" role="alert">
+            Este niño aún no tiene vacunas registradas.
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
