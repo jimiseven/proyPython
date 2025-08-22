@@ -1,0 +1,4 @@
+ejecutar en el siguiente orden : 
+- crear la base de datos (alojada en la carpera bd de cada test)
+- correr el comando de "pip install Flask mysql-connector-python"
+- 
